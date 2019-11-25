@@ -9,45 +9,68 @@ import javax.ws.rs.core.MediaType;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
 public class Main {
+    private static Client client = ClientBuilder.newBuilder().register(JacksonFeature.class).build();
+
     public static void main(String args[]) {
 
-        System.out.println("Enter Bus Stop ID: ");
+        System.out.println("Enter Postcode: ");
 
         Scanner scanner = new Scanner(System.in);
-        String code = "490008660N";  // scanner.nextLine();
+        String postcode = scanner.nextLine();
 
-
-        Client client = ClientBuilder.newBuilder().register(JacksonFeature.class).build();
         try {
-            List<BusInfo> infos = client.target("https://api.tfl.gov.uk/StopPoint/" + code + "/Arrivals")
-                    .request(MediaType.APPLICATION_JSON)
-                    .get(new GenericType<List<BusInfo>>() {});
-
-            infos.stream()
-                    .sorted(Comparator.comparingInt(BusInfo::getTimeToStation))
-                    .limit(5)
-                    .forEachOrdered(info -> System.out.println(info));
-
-
-            PostcodesApiResult postcode = client.target("https://api.postcodes.io/postcodes/NW51TL")
-                    .request(MediaType.APPLICATION_JSON)
-                    .get(PostcodesApiResult.class);
-
-            System.out.println(postcode.getResult().getLatitude());
-
-            String nearestStopQuery = String.format("https://api.tfl.gov.uk/StopPoint?stopTypes=NaptanPublicBusCoachTram&lat=%f&lon=%f",
-                    postcode.getResult().getLatitude(), postcode.getResult().getLongitude());
-            BusStopInfo busStopInfo = client.target(nearestStopQuery)
-                    .request(MediaType.APPLICATION_JSON)
-                    .get(BusStopInfo.class);
-
-            busStopInfo.getStopPoints().stream()
-                    .forEachOrdered(info -> System.out.println(info.getDistance()));
-
+            printAllBusInfo(getStops(getCoordinates(postcode)));
         } catch (Exception err) {
             err.printStackTrace();
         }
+    }
+
+    private static PostcodeResult.Coordinates getCoordinates(String postcode) {
+        String query = String.format("https://api.postcodes.io/postcodes/%s", postcode);
+
+        PostcodeResult result = client.target(query)
+                .request(MediaType.APPLICATION_JSON)
+                .get(PostcodeResult.class);
+
+        return result.getCoordinates();
+    }
+
+    private static List<BusStopInfo.StopPoint> getStops(PostcodeResult.Coordinates coordinates) {
+        String query = String.format("https://api.tfl.gov.uk/StopPoint?stopTypes=NaptanPublicBusCoachTram&lat=%f&lon=%f",
+                coordinates.getLatitude(), coordinates.getLongitude());
+
+        BusStopInfo busStopInfo = client.target(query)
+                .request(MediaType.APPLICATION_JSON)
+                .get(BusStopInfo.class);
+
+        return busStopInfo.getStopPoints()
+                .stream()
+                .sorted(Comparator.comparingDouble(BusStopInfo.StopPoint::getDistance))
+                .limit(2)
+                .collect(Collectors.toList());
+    }
+
+    private static void printAllBusInfo(List<BusStopInfo.StopPoint> list) {
+        list.forEach(Main::printBusInfo);
+    }
+
+    private static void printBusInfo(BusStopInfo.StopPoint stop) {
+        System.out.println(String.format("Bus Stop: %s, Distance: %.0f metres", stop.getCommonName(), stop.getDistance()));
+
+        String query = String.format("https://api.tfl.gov.uk/StopPoint/%s/Arrivals", stop.getNaptanId());
+
+        List<BusInfo> infos = client.target(query)
+                .request(MediaType.APPLICATION_JSON)
+                .get(new GenericType<List<BusInfo>>() {});
+
+        infos.stream()
+                .sorted(Comparator.comparingInt(BusInfo::getTimeToStation))
+                .limit(5)
+                .forEachOrdered(info -> System.out.println(info));
+
+        System.out.println();
     }
 }	
