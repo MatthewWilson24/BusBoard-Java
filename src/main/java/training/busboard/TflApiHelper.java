@@ -1,8 +1,11 @@
 package training.busboard;
 
 import org.glassfish.jersey.jackson.JacksonFeature;
+import org.omg.CosNaming.NamingContextPackage.NotFound;
 import training.busboard.web.BusDisplay;
 
+import javax.ws.rs.NotFoundException;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.core.GenericType;
@@ -22,8 +25,11 @@ public class TflApiHelper {
                     .map(this::getStopDisplay)
                     .collect(Collectors.toList());
 
+        } catch (PostcodeException err) {
+            // Catch post code exception error
+            return null;
         } catch (Exception err) {
-            System.out.println(err);
+            // Add general exception behaviour
             return null;
         }
     }
@@ -33,6 +39,8 @@ public class TflApiHelper {
             List<StopInfo.StopPoint> list = getStops(getCoordinates(postcode));
             list.stream().forEachOrdered(this::printStopDisplay);
 
+        } catch (PostcodeException err) {
+            System.out.println(err);
         } catch (Exception err) {
             System.out.println(err);
         }
@@ -48,13 +56,19 @@ public class TflApiHelper {
     }
 
     private PostcodeResult.Coordinates getCoordinates(String postcode) {
-        String query = String.format("https://api.postcodes.io/postcodes/%s", postcode);
+        try {
+            String query = String.format("https://api.postcodes.io/postcodes/%s", postcode);
 
-        PostcodeResult result = client.target(query)
-                .request(MediaType.APPLICATION_JSON)
-                .get(PostcodeResult.class);
+            PostcodeResult result = client.target(query)
+                    .request(MediaType.APPLICATION_JSON)
+                    .get(PostcodeResult.class);
 
-        return result.getCoordinates();
+            return result.getCoordinates();
+
+        } catch(NotFoundException err) {
+            throw new PostcodeException(err.getMessage());
+        }
+
     }
 
     private List<StopInfo.StopPoint> getStops(PostcodeResult.Coordinates coordinates) {
