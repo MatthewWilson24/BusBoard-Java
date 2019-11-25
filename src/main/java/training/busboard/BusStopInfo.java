@@ -3,32 +3,28 @@ package training.busboard;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.xml.bind.annotation.XmlRootElement;
+import java.util.List;
 
 @XmlRootElement
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class BusStopInfo {
-    String lineId;
-    String destinationName;
-    int timeToStation;
+    private List<StopPoints> stopPoints;
 
-    public String getLineId() {
-        return lineId;
+    public List<StopPoints> getStopPoints() {
+        return stopPoints;
     }
 
-    public String getDestinationName() {
-        return destinationName;
-    }
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public static class StopPoints {
+        private String naptanId;
+        private double distance;
 
-    public int getTimeToStation() {
-        return timeToStation;
-    }
+        public String getNaptanId() {
+            return naptanId;
+        }
 
-    private String getMinsSecs() {
-        return String.format("%d mins %d secs", timeToStation / 60, timeToStation % 60);
-    }
-
-    @Override
-    public String toString() {
-        return String.format("Number: %s, Destination: %s, Time: %s", lineId, destinationName, getMinsSecs());
+        public double getDistance() {
+            return distance;
+        }
     }
 }

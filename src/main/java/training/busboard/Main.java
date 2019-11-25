@@ -21,14 +21,30 @@ public class Main {
 
         Client client = ClientBuilder.newBuilder().register(JacksonFeature.class).build();
         try {
-            List<BusStopInfo> infos = client.target("https://api.tfl.gov.uk/StopPoint/" + code + "/Arrivals")
+            List<BusInfo> infos = client.target("https://api.tfl.gov.uk/StopPoint/" + code + "/Arrivals")
                     .request(MediaType.APPLICATION_JSON)
-                    .get(new GenericType<List<BusStopInfo>>() {});
+                    .get(new GenericType<List<BusInfo>>() {});
 
             infos.stream()
-                    .sorted(Comparator.comparingInt(BusStopInfo::getTimeToStation))
+                    .sorted(Comparator.comparingInt(BusInfo::getTimeToStation))
                     .limit(5)
                     .forEachOrdered(info -> System.out.println(info));
+
+
+            PostcodesApiResult postcode = client.target("https://api.postcodes.io/postcodes/NW51TL")
+                    .request(MediaType.APPLICATION_JSON)
+                    .get(PostcodesApiResult.class);
+
+            System.out.println(postcode.getResult().getLatitude());
+
+            String nearestStopQuery = String.format("https://api.tfl.gov.uk/StopPoint?stopTypes=NaptanPublicBusCoachTram&lat=%f&lon=%f",
+                    postcode.getResult().getLatitude(), postcode.getResult().getLongitude());
+            BusStopInfo busStopInfo = client.target(nearestStopQuery)
+                    .request(MediaType.APPLICATION_JSON)
+                    .get(BusStopInfo.class);
+
+            busStopInfo.getStopPoints().stream()
+                    .forEachOrdered(info -> System.out.println(info.getDistance()));
 
         } catch (Exception err) {
             err.printStackTrace();
