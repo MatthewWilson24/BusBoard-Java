@@ -22,6 +22,10 @@ public class BusDisplay {
         return stopDisplays;
     }
 
+    public boolean hasNextStop() {
+        return !stopDisplays.isEmpty();
+    }
+
     public static class StopDisplay {
         private String busStopName;
         private Double distance;
@@ -45,8 +49,14 @@ public class BusDisplay {
             return nextBuses;
         }
 
+        public boolean hasNextBus() {
+            return !nextBuses.isEmpty();
+        }
+
         public String getDisplayDistance() {
             return String.format("%.0f metres", distance);
         }
+
+
     }
 }
