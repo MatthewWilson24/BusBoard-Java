@@ -11,7 +11,7 @@ public class BusDisplay {
 
     public BusDisplay(String postcode) {
         this.postcode = postcode;
-        stopDisplays = new TflApiHelper().getBusStopDisplays(postcode);
+        stopDisplays = new TflApiHelper().getAllStopDisplays(postcode);
     }
 
     public String getPostcode() {

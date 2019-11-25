@@ -26,4 +26,9 @@ public class BusInfo {
     public String getMinsSecs() {
         return String.format("%d mins %d secs", timeToStation / 60, timeToStation % 60);
     }
+
+    @Override
+    public String toString() {
+        return String.format("Number: %s, Destination: %s, Time: %s", lineId, destinationName, getMinsSecs());
+    }
 }

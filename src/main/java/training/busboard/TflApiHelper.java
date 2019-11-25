@@ -14,18 +14,37 @@ import java.util.stream.Collectors;
 public class TflApiHelper {
     private Client client = ClientBuilder.newBuilder().register(JacksonFeature.class).build();
 
-    public List<BusDisplay.StopDisplay> getBusStopDisplays(String postcode) {
+    public List<BusDisplay.StopDisplay> getAllStopDisplays(String postcode) {
         try {
             List<StopInfo.StopPoint> list = getStops(getCoordinates(postcode));
 
             return list.stream()
-                    .map(this::getBusStopDisplay)
+                    .map(this::getStopDisplay)
                     .collect(Collectors.toList());
 
         } catch (Exception err) {
-            err.printStackTrace();
+            System.out.println(err);
             return null;
         }
+    }
+
+    public void printAllStopDisplays(String postcode) {
+        try {
+            List<StopInfo.StopPoint> list = getStops(getCoordinates(postcode));
+            list.stream().forEachOrdered(this::printStopDisplay);
+
+        } catch (Exception err) {
+            System.out.println(err);
+        }
+    }
+
+    private void printStopDisplay(StopInfo.StopPoint stop) {
+        System.out.println(String.format("Bus Stop: %s, Distance: %.0f metres", stop.getCommonName(), stop.getDistance()));
+
+        getStopDisplay(stop).getNextBuses().stream()
+                .forEachOrdered(info -> System.out.println(info));
+
+        System.out.println();
     }
 
     private PostcodeResult.Coordinates getCoordinates(String postcode) {
@@ -53,12 +72,13 @@ public class TflApiHelper {
                 .collect(Collectors.toList());
     }
 
-    private BusDisplay.StopDisplay getBusStopDisplay(StopInfo.StopPoint stop) {
+    private BusDisplay.StopDisplay getStopDisplay(StopInfo.StopPoint stop) {
         String query = String.format("https://api.tfl.gov.uk/StopPoint/%s/Arrivals", stop.getNaptanId());
 
         List<BusInfo> infos = client.target(query)
                 .request(MediaType.APPLICATION_JSON)
-                .get(new GenericType<List<BusInfo>>() {});
+                .get(new GenericType<List<BusInfo>>() {
+                });
 
         infos = infos.stream()
                 .sorted(Comparator.comparingInt(BusInfo::getTimeToStation))
