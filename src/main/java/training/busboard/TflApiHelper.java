@@ -1,6 +1,7 @@
 package training.busboard;
 
 import org.glassfish.jersey.jackson.JacksonFeature;
+import training.busboard.web.BusDisplay;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -8,27 +9,26 @@ import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.MediaType;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Scanner;
 import java.util.stream.Collectors;
 
-public class Main {
-    private static Client client = ClientBuilder.newBuilder().register(JacksonFeature.class).build();
+public class TflApiHelper {
+    private Client client = ClientBuilder.newBuilder().register(JacksonFeature.class).build();
 
-    public static void main(String args[]) {
-
-        System.out.println("Enter Postcode: ");
-
-        Scanner scanner = new Scanner(System.in);
-        String postcode = scanner.nextLine();
-
+    public List<BusDisplay.StopDisplay> getBusStopDisplays(String postcode) {
         try {
-            printAllBusInfo(getStops(getCoordinates(postcode)));
+            List<StopInfo.StopPoint> list = getStops(getCoordinates(postcode));
+
+            return list.stream()
+                    .map(this::getBusStopDisplay)
+                    .collect(Collectors.toList());
+
         } catch (Exception err) {
             err.printStackTrace();
+            return null;
         }
     }
 
-    private static PostcodeResult.Coordinates getCoordinates(String postcode) {
+    private PostcodeResult.Coordinates getCoordinates(String postcode) {
         String query = String.format("https://api.postcodes.io/postcodes/%s", postcode);
 
         PostcodeResult result = client.target(query)
@@ -38,39 +38,34 @@ public class Main {
         return result.getCoordinates();
     }
 
-    private static List<BusStopInfo.StopPoint> getStops(PostcodeResult.Coordinates coordinates) {
+    private List<StopInfo.StopPoint> getStops(PostcodeResult.Coordinates coordinates) {
         String query = String.format("https://api.tfl.gov.uk/StopPoint?stopTypes=NaptanPublicBusCoachTram&lat=%f&lon=%f",
                 coordinates.getLatitude(), coordinates.getLongitude());
 
-        BusStopInfo busStopInfo = client.target(query)
+        StopInfo stopInfo = client.target(query)
                 .request(MediaType.APPLICATION_JSON)
-                .get(BusStopInfo.class);
+                .get(StopInfo.class);
 
-        return busStopInfo.getStopPoints()
+        return stopInfo.getStopPoints()
                 .stream()
-                .sorted(Comparator.comparingDouble(BusStopInfo.StopPoint::getDistance))
+                .sorted(Comparator.comparingDouble(StopInfo.StopPoint::getDistance))
                 .limit(2)
                 .collect(Collectors.toList());
     }
 
-    private static void printAllBusInfo(List<BusStopInfo.StopPoint> list) {
-        list.forEach(Main::printBusInfo);
-    }
-
-    private static void printBusInfo(BusStopInfo.StopPoint stop) {
-        System.out.println(String.format("Bus Stop: %s, Distance: %.0f metres", stop.getCommonName(), stop.getDistance()));
-
+    private BusDisplay.StopDisplay getBusStopDisplay(StopInfo.StopPoint stop) {
         String query = String.format("https://api.tfl.gov.uk/StopPoint/%s/Arrivals", stop.getNaptanId());
 
         List<BusInfo> infos = client.target(query)
                 .request(MediaType.APPLICATION_JSON)
                 .get(new GenericType<List<BusInfo>>() {});
 
-        infos.stream()
+        infos = infos.stream()
                 .sorted(Comparator.comparingInt(BusInfo::getTimeToStation))
                 .limit(5)
-                .forEachOrdered(info -> System.out.println(info));
+                .collect(Collectors.toList());
 
-        System.out.println();
+        return new BusDisplay.StopDisplay(stop.getCommonName(), stop.getDistance(), infos);
     }
-}	
+
+}

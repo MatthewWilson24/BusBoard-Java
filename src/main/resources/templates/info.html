@@ -3,7 +3,7 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="layout">
 
-    <!--@thymesVar id="busInfo" type="training.busboard.web.BusInfo"-->
+<!--@thymesVar id="busInfo" type="training.busboard.web.BusDisplay"-->
 
     <head>
         <title>Bus Information</title>
@@ -13,6 +13,17 @@
             <h2>Bus Information</h2>
             <div>
                 <p>You entered postcode <span th:text="${busInfo.postcode}"></span></p>
+            </div>
+            <div th:each="stop: ${busInfo.getStopDisplays()}">
+                <p>
+                    Stop: <span th:text="${stop.getBusStopName()}"></span>
+                    , Distance: <span th:text="${stop.getDisplayDistance()}"></span>
+                </p>
+                <p th:each="bus: ${stop.getNextBuses()}">
+                    Number: <span th:text="${bus.getLineId()}"></span>
+                    , Destination: <span th:text="${bus.getDestinationName()}"></span>
+                    , Time To Arrival: <span th:text="${bus.getMinsSecs()}"></span>
+                </p>
             </div>
         </div>
     </body>

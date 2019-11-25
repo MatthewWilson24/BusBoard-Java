@@ -7,7 +7,7 @@ import java.util.List;
 
 @XmlRootElement
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class BusStopInfo {
+public class StopInfo {
     private List<StopPoint> stopPoints;
 
     public List<StopPoint> getStopPoints() {
