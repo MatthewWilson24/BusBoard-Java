@@ -2,6 +2,10 @@
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="layout">
+
+
+<!--@thymesVar id="hasError" type="java.lang.Boolean"-->
+
 <head>
     <title>Home page</title>
 </head>
@@ -18,6 +22,7 @@
                     <legend>Postcode: </legend>
                     <input type="text" name="postcode">
                     <input type="submit" value="Get Bus Info" />
+                    <h1 th:if="${hasError}">You suck</h1>
                 </fieldset>
             </form>
         </div>

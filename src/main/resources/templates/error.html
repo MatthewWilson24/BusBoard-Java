@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="layout">
+
+
+<head>
+    <title>Error Page</title>
+</head>
+<body>
+<div layout:fragment="content" class="container body-content">
+    <h2>Invalid Request</h2>
+    <div>
+        <p>You entered an invalid postcode <span th:text="${busInfo.postcode}"></span></p>
+    </div>
+</div>
+</body>
+</html>

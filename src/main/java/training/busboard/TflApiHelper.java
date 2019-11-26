@@ -3,6 +3,7 @@ package training.busboard;
 import org.glassfish.jersey.jackson.JacksonFeature;
 import training.busboard.web.BusDisplay;
 
+import javax.ws.rs.BadRequestException;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -17,20 +18,11 @@ public class TflApiHelper {
 
     // Website Method
     public List<BusDisplay.StopDisplay> getAllStopDisplays(String postcode) {
-        try {
-            List<StopInfo.StopPoint> list = getStops(getCoordinates(postcode));
+        List<StopInfo.StopPoint> list = getStops(getCoordinates(postcode));
 
-            return list.stream()
-                    .map(this::getStopDisplay)
-                    .collect(Collectors.toList());
-
-        } catch (PostcodeException err) {
-            // Catch post code exception error
-            return null;
-        } catch (Exception err) {
-            // Add general exception behaviour
-            return null;
-        }
+        return list.stream()
+                .map(this::getStopDisplay)
+                .collect(Collectors.toList());
     }
 
     // Command Line Methods
@@ -66,7 +58,7 @@ public class TflApiHelper {
 
             return result.getCoordinates();
 
-        } catch(NotFoundException err) {
+        } catch (NotFoundException | BadRequestException err) {
             throw new PostcodeException(err.getMessage());
         }
     }
