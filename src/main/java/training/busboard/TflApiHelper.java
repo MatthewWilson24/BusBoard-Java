@@ -1,11 +1,9 @@
 package training.busboard;
 
 import org.glassfish.jersey.jackson.JacksonFeature;
-import org.omg.CosNaming.NamingContextPackage.NotFound;
 import training.busboard.web.BusDisplay;
 
 import javax.ws.rs.NotFoundException;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.core.GenericType;
@@ -17,6 +15,7 @@ import java.util.stream.Collectors;
 public class TflApiHelper {
     private Client client = ClientBuilder.newBuilder().register(JacksonFeature.class).build();
 
+    // Website Method
     public List<BusDisplay.StopDisplay> getAllStopDisplays(String postcode) {
         try {
             List<StopInfo.StopPoint> list = getStops(getCoordinates(postcode));
@@ -34,6 +33,7 @@ public class TflApiHelper {
         }
     }
 
+    // Command Line Methods
     public void printAllStopDisplays(String postcode) {
         try {
             List<StopInfo.StopPoint> list = getStops(getCoordinates(postcode));
@@ -55,6 +55,7 @@ public class TflApiHelper {
         System.out.println();
     }
 
+    // Query Methods
     private PostcodeResult.Coordinates getCoordinates(String postcode) {
         try {
             String query = String.format("https://api.postcodes.io/postcodes/%s", postcode);
@@ -68,7 +69,6 @@ public class TflApiHelper {
         } catch(NotFoundException err) {
             throw new PostcodeException(err.getMessage());
         }
-
     }
 
     private List<StopInfo.StopPoint> getStops(PostcodeResult.Coordinates coordinates) {
@@ -101,5 +101,4 @@ public class TflApiHelper {
 
         return new BusDisplay.StopDisplay(stop.getCommonName(), stop.getDistance(), infos);
     }
-
 }

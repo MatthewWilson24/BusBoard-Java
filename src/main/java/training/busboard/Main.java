@@ -8,7 +8,5 @@ public class Main {
         System.out.println("Please enter a postcode: ");
         String postcode = scanner.nextLine();
         new TflApiHelper().printAllStopDisplays(postcode);
-
-
     }
 }
