@@ -13,18 +13,6 @@ public class BusDisplay {
 
     public BusDisplay(String postcode) {
         this.postcode = postcode;
-        updateStopDisplays();
-        Timer t = new Timer();
-        t.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                updateStopDisplays();
-            }
-        }, 30000, 30000);
-
-    }
-
-    public void updateStopDisplays() {
         stopDisplays = new TflApiHelper().getAllStopDisplays(postcode);
     }
 
