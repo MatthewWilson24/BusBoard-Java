@@ -31,7 +31,7 @@ public class TflApiHelper {
             List<StopInfo.StopPoint> list = getStops(getCoordinates(postcode));
             list.stream().forEachOrdered(this::printStopDisplay);
 
-        } catch (PostcodeException err) {
+        } catch (InvalidPostcodeException err) {
             System.out.println(err);
         } catch (Exception err) {
             System.out.println(err);
@@ -58,8 +58,10 @@ public class TflApiHelper {
 
             return result.getCoordinates();
 
-        } catch (NotFoundException | BadRequestException err) {
-            throw new PostcodeException(err.getMessage());
+        } catch (NotFoundException err) {
+            throw new InvalidPostcodeException(err.getMessage());
+        } catch (BadRequestException err) {
+            throw new NoPostcodeException(err.getMessage());
         }
     }
 

@@ -4,7 +4,8 @@
       layout:decorate="layout">
 
 
-<!--@thymesVar id="hasError" type="java.lang.Boolean"-->
+<!--@thymesVar id="invalidPostcode" type="java.lang.Boolean"-->
+<!--@thymesVar id="noPostcode" type="java.lang.Boolean"-->
 
 <head>
     <title>Home page</title>
@@ -22,7 +23,8 @@
                     <legend>Postcode: </legend>
                     <input type="text" name="postcode">
                     <input type="submit" value="Get Bus Info" />
-                    <h1 th:if="${hasError}">You suck</h1>
+                    <h1 th:if="${invalidPostcode}">You suck</h1>
+                    <h1 th:if="${noPostcode}">You can't type</h1>
                 </fieldset>
             </form>
         </div>
