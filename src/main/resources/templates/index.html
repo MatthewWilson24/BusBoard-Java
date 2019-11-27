@@ -23,8 +23,8 @@
                     <legend>Postcode: </legend>
                     <input type="text" name="postcode">
                     <input type="submit" value="Get Bus Info" />
-                    <h1 th:if="${invalidPostcode}">You suck</h1>
-                    <h1 th:if="${noPostcode}">You can't type</h1>
+                    <p th:if="${invalidPostcode}">Invalid postcode</p>
+                    <p th:if="${noPostcode}">No postcode entered</p>
                 </fieldset>
             </form>
         </div>

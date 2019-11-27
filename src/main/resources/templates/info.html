@@ -13,8 +13,7 @@
     </head>
     <body>
         <div layout:fragment="content" class="container body-content">
-            <h2 class="page-header">Bus Information</h2>
-            <h4 class="user-input">You entered postcode <span th:text="${busInfo.postcode}"></span></h4>
+            <h1 class="page-header">Buses near <span th:text="${busInfo.postcode}"></span></h1>
             <br/>
             <ol class="all-info"
                 th:if="${busInfo.hasNextStop()}">
@@ -35,16 +34,16 @@
                             </ul>
                         </li>
                     </ol>
-                    <p th:unless="${stop.hasNextBus()}">
-                        No buses!
+                    <p class="error-message" th:unless="${stop.hasNextBus()}">
+                        No buses are arriving soon.
                     </p>
                     <br/>
                 </li>
             </ol>
 
             <div th:unless="${busInfo.hasNextStop()}">
-                <p>
-                    No nearby bus stops!
+                <p class="error-message">
+                    No TfL bus stops found in your area.
                 </p>
                 <br/>
             </div>

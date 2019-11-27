@@ -12,7 +12,7 @@ public class BusDisplay {
     private List<StopDisplay> stopDisplays;
 
     public BusDisplay(String postcode) {
-        this.postcode = postcode;
+        this.postcode = formatPostcode(postcode);
         stopDisplays = new TflApiHelper().getAllStopDisplays(postcode);
     }
 
@@ -26,6 +26,12 @@ public class BusDisplay {
 
     public boolean hasNextStop() {
         return !stopDisplays.isEmpty();
+    }
+
+    private static String formatPostcode(String p) {
+        int len = p.length();
+        p = p.toUpperCase();
+        return String.format("%s %s", p.substring(0, len - 3), p.substring(len - 3, len));
     }
 
     public static class StopDisplay {

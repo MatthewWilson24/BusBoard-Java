@@ -1,4 +1,5 @@
 .page-header {
+
 }
 
 .user-input {
@@ -21,7 +22,7 @@
     text-align: center;
 }
 
-@media (max-device-width: 1024px) {
+@media (max-device-width: 720px) {
     .bus-info-box {
         display: block;
         height: auto;
@@ -40,6 +41,13 @@
 .destination-name {
     height: 3em;
     margin: 0.3em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.error-message {
+    padding-top: 1em;
+    padding-bottom: 1em;
 }
 
 .tta {
