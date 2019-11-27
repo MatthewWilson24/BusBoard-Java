@@ -7,31 +7,40 @@
 
     <head>
         <title>Bus Information</title>
-        <meta http-equiv="refresh" content="30">
+ <!--       <meta http-equiv="refresh" content="30"> -->
+        <link rel="stylesheet" th:href="@{/css/info.css}"
+              href="../../css/info.css" />
     </head>
     <body>
         <div layout:fragment="content" class="container body-content">
-            <h2>Bus Information</h2>
-            <div>
-                <p>You entered postcode <span th:text="${busInfo.postcode}"></span></p>
-            </div>
-            <div th:if="${busInfo.hasNextStop()}"
+            <h2 class="page-header">Bus Information</h2>
+            <h4 class="user-input">You entered postcode <span th:text="${busInfo.postcode}"></span></h4>
+            <ol class="all-info">
+                <li class="stop-box"
+                    th:if="${busInfo.hasNextStop()}"
                     th:each="stop: ${busInfo.getStopDisplays()}">
-                <p>
-                    Stop: <span th:text="${stop.getBusStopName()}"></span>
-                    , Distance: <span th:text="${stop.getDisplayDistance()}"></span>
-                </p>
-                <p th:if="${stop.hasNextBus()}"
-                   th:each="bus: ${stop.getNextBuses()}">
-                    Number: <span th:text="${bus.getLineId()}"></span>
-                    , Destination: <span th:text="${bus.getDestinationName()}"></span>
-                    , Time To Arrival: <span th:text="${bus.getMinsSecs()}"></span>
-                </p>
-                <p th:unless="${stop.hasNextBus()}">
-                    No buses!
-                </p>
-                <br/>
-            </div>
+                    <div class="stop-info">
+                        <h3>Stop: <span th:text="${stop.getBusStopName()}"></span></h3>
+                        <h5>Distance: <span th:text="${stop.getDisplayDistance()}"></span></h5>
+                    </div>
+                    <ol class="bus-info-box">
+                        <li class="bus-info"
+                           th:if="${stop.hasNextBus()}"
+                           th:each="bus: ${stop.getNextBuses()}">
+                            <ul>
+                                <li><span th:text="${bus.getLineId()}"></span></li>
+                                <li><span th:text="${bus.getDestinationName()}"></span></li>
+                                <li><span th:text="${bus.getMinsSecs()}"></span></li>
+                            </ul>
+                        </li>
+                    </ol>
+                    <p th:unless="${stop.hasNextBus()}">
+                        No buses!
+                    </p>
+                    <br/>
+                </li>
+            </ol>
+
             <div th:unless="${busInfo.hasNextStop()}">
                 <p>
                     No nearby bus stops!
