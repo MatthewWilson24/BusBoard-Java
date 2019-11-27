@@ -1,7 +1,56 @@
-.page-header {}
+.page-header {
+}
 
-.user-input {}
+.user-input {
+}
 
-.stop-info {}
+.stop-info {
+}
 
-.bus-info {}
+.bus-info-box {
+    display: flex;
+    height: 12em;
+}
+
+.bus-info {
+    padding: 1em;
+    width: 20%;
+    border: 0.1em solid #DC241F;
+    border-radius: 0.5em;
+    margin: 1em;
+    text-align: center;
+}
+
+@media (max-device-width: 1024px) {
+    .bus-info-box {
+        display: block;
+        height: auto;
+    }
+
+    .bus-info {
+        width: 100%;
+    }
+}
+
+.line-id {
+    font-weight: bold;
+    font-size: 1.5em;
+}
+
+.destination-name {
+    height: 3em;
+    margin: 0.3em;
+}
+
+.tta {
+
+}
+
+ol, ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+ul {
+    list-style-type: none;
+}

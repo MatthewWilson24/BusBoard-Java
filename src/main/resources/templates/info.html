@@ -15,22 +15,23 @@
         <div layout:fragment="content" class="container body-content">
             <h2 class="page-header">Bus Information</h2>
             <h4 class="user-input">You entered postcode <span th:text="${busInfo.postcode}"></span></h4>
-            <ol class="all-info">
+            <br/>
+            <ol class="all-info"
+                th:if="${busInfo.hasNextStop()}">
                 <li class="stop-box"
-                    th:if="${busInfo.hasNextStop()}"
                     th:each="stop: ${busInfo.getStopDisplays()}">
                     <div class="stop-info">
-                        <h3>Stop: <span th:text="${stop.getBusStopName()}"></span></h3>
+                        <h3><span th:text="${stop.getBusStopName()}"></span></h3>
                         <h5>Distance: <span th:text="${stop.getDisplayDistance()}"></span></h5>
                     </div>
-                    <ol class="bus-info-box">
+                    <ol th:if="${stop.hasNextBus()}"
+                        class="bus-info-box">
                         <li class="bus-info"
-                           th:if="${stop.hasNextBus()}"
                            th:each="bus: ${stop.getNextBuses()}">
                             <ul>
-                                <li><span th:text="${bus.getLineId()}"></span></li>
-                                <li><span th:text="${bus.getDestinationName()}"></span></li>
-                                <li><span th:text="${bus.getMinsSecs()}"></span></li>
+                                <li class="line-id"><span th:text="${bus.getLineId()}"></span></li>
+                                <li class="destination-name"><span th:text="${bus.getDestinationName()}"></span></li>
+                                <li class="tta"><span th:text="${bus.getMinsSecs()}"></span></li>
                             </ul>
                         </li>
                     </ol>
